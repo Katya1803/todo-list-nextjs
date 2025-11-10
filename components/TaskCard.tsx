@@ -8,7 +8,14 @@ interface TaskCardProps {
 }
 
 export default function TaskCard({ task }: TaskCardProps) {
-  const isOverdue = task.due_date && new Date(task.due_date) < new Date() && task.status !== "done";
+  const now = new Date();
+  let isOverdue = false;
+
+  if (task.due_date) {
+    const due = new Date(task.due_date);
+    due.setHours(23, 59, 59, 999);
+    isOverdue = now > due && task.status !== "done";
+  }
   const isDone = task.status === "done";
 
   const priorityConfig = {
