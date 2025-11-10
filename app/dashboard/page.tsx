@@ -53,9 +53,12 @@ function DashboardPageContent() {
     todo: filteredTasks.filter((t) => t.status === "todo").length,
     inProgress: filteredTasks.filter((t) => t.status === "in-progress").length,
     done: filteredTasks.filter((t) => t.status === "done").length,
-    overdue: filteredTasks.filter(
-      (t) => t.due_date && new Date(t.due_date) < new Date() && t.status !== "done"
-    ).length,
+    overdue: filteredTasks.filter((t) => {
+    if (!t.due_date || t.status === "done") return false;
+    const due = new Date(t.due_date);
+    due.setHours(23, 59, 59, 999);
+    return new Date() > due;
+    }).length,
     high: filteredTasks.filter((t) => t.priority === "high").length,
     medium: filteredTasks.filter((t) => t.priority === "medium").length,
     low: filteredTasks.filter((t) => t.priority === "low").length,
