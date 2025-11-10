@@ -92,7 +92,7 @@ export default function TaskCard({ task }: TaskCardProps) {
               />
             </svg>
             <span className={isOverdue ? "text-red-600 font-medium" : "text-gray-500"}>
-              {new Date(task.due_date).toLocaleDateString()}
+              {new Date(task.due_date).toLocaleDateString("en-CA")}
               {isOverdue && " - Overdue"}
             </span>
           </div>
