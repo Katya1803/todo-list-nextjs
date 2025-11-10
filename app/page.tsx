@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import TaskCard from "@/components/TaskCard";
 import FilterBar from "@/components/FilterBar";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
+import Link from "next/link";
 
 function HomePageContent() {
   const { user, signOut } = useAuth();
@@ -88,12 +89,26 @@ function HomePageContent() {
                 Welcome, {user?.email}
               </p>
             </div>
-            <button
-              onClick={handleSignOut}
-              className="px-4 py-2 text-gray-600 hover:text-gray-900 font-medium transition-colors"
-            >
-              Sign Out
-            </button>
+            <div className="flex items-center gap-4">
+              <Link
+                href="/dashboard"
+                className="px-4 py-2 text-gray-600 hover:text-gray-900 font-medium transition-colors"
+              >
+                Dashboard
+              </Link>
+              <Link
+                href="/calendar"
+                className="px-4 py-2 text-gray-600 hover:text-gray-900 font-medium transition-colors"
+              >
+                Calendar
+              </Link>
+              <button
+                onClick={handleSignOut}
+                className="px-4 py-2 text-gray-600 hover:text-gray-900 font-medium transition-colors"
+              >
+                Sign Out
+              </button>
+            </div>
           </div>
         </div>
       </header>
