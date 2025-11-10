@@ -2,23 +2,24 @@
 
 import { useRouter } from "next/navigation";
 import { TaskFormData } from "@/types/task";
-import { storage } from "@/lib/storage";
+import { database } from "@/lib/database";
 import TaskForm from "@/components/TaskForm";
 import BackButton from "@/components/BackButton";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { useState } from "react";
 
-export default function AddTaskPage() {
+function AddTaskPageContent() {
   const router = useRouter();
+  const [error, setError] = useState("");
 
-  const handleSubmit = (formData: TaskFormData) => {
-    const newTask = {
-      id: crypto.randomUUID(),
-      ...formData,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
-
-    storage.addTask(newTask);
-    router.push("/");
+  const handleSubmit = async (formData: TaskFormData) => {
+    try {
+      await database.addTask(formData);
+      router.push("/");
+    } catch (err: any) {
+      setError(err.message || "Failed to create task");
+      console.error("Error creating task:", err);
+    }
   };
 
   return (
@@ -34,10 +35,23 @@ export default function AddTaskPage() {
 
       {/* Main Content */}
       <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
+            {error}
+          </div>
+        )}
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
           <TaskForm onSubmit={handleSubmit} />
         </div>
       </main>
     </div>
+  );
+}
+
+export default function AddTaskPage() {
+  return (
+    <ProtectedRoute>
+      <AddTaskPageContent />
+    </ProtectedRoute>
   );
 }

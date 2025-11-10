@@ -3,28 +3,43 @@
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { Task, TaskFormData } from "@/types/task";
-import { storage } from "@/lib/storage";
+import { database } from "@/lib/database";
 import TaskForm from "@/components/TaskForm";
 import BackButton from "@/components/BackButton";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
 
-export default function EditTaskPage() {
+function EditTaskPageContent() {
   const router = useRouter();
   const params = useParams();
   const taskId = params.id as string;
 
   const [task, setTask] = useState<Task | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    const tasks = storage.getTasks();
-    const foundTask = tasks.find((t) => t.id === taskId);
-    setTask(foundTask || null);
-    setLoading(false);
+    loadTask();
   }, [taskId]);
 
-  const handleSubmit = (formData: TaskFormData) => {
-    storage.updateTask(taskId, formData);
-    router.push("/");
+  const loadTask = async () => {
+    try {
+      const data = await database.getTask(taskId);
+      setTask(data);
+    } catch (err) {
+      console.error("Error loading task:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSubmit = async (formData: TaskFormData) => {
+    try {
+      await database.updateTask(taskId, formData);
+      router.push("/");
+    } catch (err: any) {
+      setError(err.message || "Failed to update task");
+      console.error("Error updating task:", err);
+    }
   };
 
   if (loading) {
@@ -66,10 +81,23 @@ export default function EditTaskPage() {
 
       {/* Main Content */}
       <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
+            {error}
+          </div>
+        )}
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
           <TaskForm task={task} onSubmit={handleSubmit} />
         </div>
       </main>
     </div>
+  );
+}
+
+export default function EditTaskPage() {
+  return (
+    <ProtectedRoute>
+      <EditTaskPageContent />
+    </ProtectedRoute>
   );
 }

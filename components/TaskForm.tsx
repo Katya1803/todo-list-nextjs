@@ -16,7 +16,7 @@ export default function TaskForm({ task, onSubmit }: TaskFormProps) {
     description: "",
     priority: "medium",
     status: "todo",
-    dueDate: "",
+    due_date: "",
   });
 
   const [errors, setErrors] = useState<{ title?: string }>({});
@@ -28,7 +28,7 @@ export default function TaskForm({ task, onSubmit }: TaskFormProps) {
         description: task.description || "",
         priority: task.priority,
         status: task.status,
-        dueDate: task.dueDate || "",
+        due_date: task.due_date || "",
       });
     }
   }, [task]);
@@ -64,7 +64,7 @@ export default function TaskForm({ task, onSubmit }: TaskFormProps) {
           }`}
           placeholder="Enter task title"
         />
-        {errors.title && <p className="text-red-500 text-sm mt-1.5">{errors.title}</p>}
+        {errors.title && <p className="text-red-500 text-sm mt-1">{errors.title}</p>}
       </div>
 
       {/* Description */}
@@ -73,14 +73,15 @@ export default function TaskForm({ task, onSubmit }: TaskFormProps) {
         <textarea
           value={formData.description}
           onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-          className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all resize-none"
           rows={4}
+          className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all resize-none"
           placeholder="Enter task description (optional)"
         />
       </div>
 
       {/* Priority and Status */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        {/* Priority */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">Priority</label>
           <select
@@ -94,6 +95,7 @@ export default function TaskForm({ task, onSubmit }: TaskFormProps) {
           </select>
         </div>
 
+        {/* Status */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
           <select
@@ -113,8 +115,8 @@ export default function TaskForm({ task, onSubmit }: TaskFormProps) {
         <label className="block text-sm font-medium text-gray-700 mb-2">Due Date</label>
         <input
           type="date"
-          value={formData.dueDate}
-          onChange={(e) => setFormData({ ...formData, dueDate: e.target.value })}
+          value={formData.due_date}
+          onChange={(e) => setFormData({ ...formData, due_date: e.target.value })}
           className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
         />
       </div>

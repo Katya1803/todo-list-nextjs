@@ -8,7 +8,7 @@ interface TaskCardProps {
 }
 
 export default function TaskCard({ task }: TaskCardProps) {
-  const isOverdue = task.dueDate && new Date(task.dueDate) < new Date() && task.status !== "done";
+  const isOverdue = task.due_date && new Date(task.due_date) < new Date() && task.status !== "done";
   const isDone = task.status === "done";
 
   const priorityConfig = {
@@ -69,7 +69,7 @@ export default function TaskCard({ task }: TaskCardProps) {
         </div>
 
         {/* Due date */}
-        {task.dueDate && (
+        {task.due_date && (
           <div className="flex items-center gap-2 text-xs">
             <svg
               className={`w-4 h-4 ${isOverdue ? "text-red-500" : "text-gray-400"}`}
@@ -84,12 +84,9 @@ export default function TaskCard({ task }: TaskCardProps) {
                 d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
               />
             </svg>
-            <span className={isOverdue ? "text-red-500 font-medium" : "text-gray-500"}>
-              {new Date(task.dueDate).toLocaleDateString("en-US", {
-                month: "short",
-                day: "numeric",
-                year: "numeric",
-              })}
+            <span className={isOverdue ? "text-red-600 font-medium" : "text-gray-500"}>
+              {new Date(task.due_date).toLocaleDateString()}
+              {isOverdue && " - Overdue"}
             </span>
           </div>
         )}

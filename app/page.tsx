@@ -2,59 +2,99 @@
 
 import { useState, useEffect } from "react";
 import { Task, Priority, Status } from "@/types/task";
-import { storage } from "@/lib/storage";
+import { database } from "@/lib/database";
+import { useAuth } from "@/contexts/AuthContext";
+import { useRouter } from "next/navigation";
 import TaskCard from "@/components/TaskCard";
 import FilterBar from "@/components/FilterBar";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
 
-export default function HomePage() {
+function HomePageContent() {
+  const { user, signOut } = useAuth();
+  const router = useRouter();
   const [tasks, setTasks] = useState<Task[]>([]);
+  const [loading, setLoading] = useState(true);
   const [searchText, setSearchText] = useState("");
   const [statusFilter, setStatusFilter] = useState<Status | "all">("all");
   const [priorityFilter, setPriorityFilter] = useState<Priority | "all">("all");
-  const [sortBy, setSortBy] = useState<"createdAt" | "dueDate">("createdAt");
+  const [sortBy, setSortBy] = useState<"created_at" | "due_date">("created_at");
 
-  // Load tasks from localStorage on mount
+  // Load tasks from Supabase
   useEffect(() => {
-    const loadedTasks = storage.getTasks();
-    setTasks(loadedTasks);
+    loadTasks();
   }, []);
+
+  const loadTasks = async () => {
+    try {
+      const data = await database.getTasks();
+      setTasks(data);
+    } catch (error) {
+      console.error("Error loading tasks:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      router.push("/login");
+    } catch (error) {
+      console.error("Error signing out:", error);
+    }
+  };
 
   // Filter and sort tasks
   const filteredTasks = tasks
     .filter((task) => {
-      // Search filter
       const matchesSearch =
         searchText === "" ||
         task.title.toLowerCase().includes(searchText.toLowerCase()) ||
         task.description?.toLowerCase().includes(searchText.toLowerCase());
 
-      // Status filter
       const matchesStatus = statusFilter === "all" || task.status === statusFilter;
-
-      // Priority filter
       const matchesPriority = priorityFilter === "all" || task.priority === priorityFilter;
 
       return matchesSearch && matchesStatus && matchesPriority;
     })
     .sort((a, b) => {
-      if (sortBy === "createdAt") {
-        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+      if (sortBy === "created_at") {
+        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
       } else {
-        // Sort by due date
-        if (!a.dueDate && !b.dueDate) return 0;
-        if (!a.dueDate) return 1;
-        if (!b.dueDate) return -1;
-        return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
+        if (!a.due_date && !b.due_date) return 0;
+        if (!a.due_date) return 1;
+        if (!b.due_date) return -1;
+        return new Date(a.due_date).getTime() - new Date(b.due_date).getTime();
       }
     });
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-gray-600">Loading tasks...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <header className="bg-white border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <h1 className="text-3xl font-bold text-gray-900">Task Manager</h1>
-          <p className="text-gray-600 mt-1">Organize your work and life</p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">Task Manager</h1>
+              <p className="text-gray-600 mt-1">
+                Welcome, {user?.email}
+              </p>
+            </div>
+            <button
+              onClick={handleSignOut}
+              className="px-4 py-2 text-gray-600 hover:text-gray-900 font-medium transition-colors"
+            >
+              Sign Out
+            </button>
+          </div>
         </div>
       </header>
 
@@ -74,9 +114,9 @@ export default function HomePage() {
         <div className="mb-6 flex items-center gap-3">
           <span className="text-sm font-medium text-gray-700">Sort by:</span>
           <button
-            onClick={() => setSortBy("createdAt")}
+            onClick={() => setSortBy("created_at")}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-              sortBy === "createdAt"
+              sortBy === "created_at"
                 ? "bg-blue-500 text-white shadow-sm"
                 : "bg-white border border-gray-200 text-gray-700 hover:bg-gray-50"
             }`}
@@ -84,9 +124,9 @@ export default function HomePage() {
             Created Date
           </button>
           <button
-            onClick={() => setSortBy("dueDate")}
+            onClick={() => setSortBy("due_date")}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-              sortBy === "dueDate"
+              sortBy === "due_date"
                 ? "bg-blue-500 text-white shadow-sm"
                 : "bg-white border border-gray-200 text-gray-700 hover:bg-gray-50"
             }`}
@@ -131,5 +171,13 @@ export default function HomePage() {
         )}
       </main>
     </div>
+  );
+}
+
+export default function HomePage() {
+  return (
+    <ProtectedRoute>
+      <HomePageContent />
+    </ProtectedRoute>
   );
 }
