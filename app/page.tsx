@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Task, Priority, Status } from "@/types/task";
-import { database } from "@/lib/database";
+import { database } from "@/lib/taskDatabase";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 import TaskCard from "@/components/TaskCard";
@@ -101,6 +101,12 @@ function HomePageContent() {
                 className="px-4 py-2 text-gray-600 hover:text-gray-900 font-medium transition-colors"
               >
                 Calendar
+              </Link>
+              <Link
+                href="/notes"
+                className="px-4 py-2 text-gray-600 hover:text-gray-900 font-medium transition-colors"
+              >
+                Notes
               </Link>
               <button
                 onClick={handleSignOut}

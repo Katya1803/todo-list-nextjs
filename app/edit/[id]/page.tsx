@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { Task, TaskFormData } from "@/types/task";
-import { database } from "@/lib/database";
+import { database } from "@/lib/taskDatabase";
 import TaskForm from "@/components/TaskForm";
 import BackButton from "@/components/BackButton";
 import { ProtectedRoute } from "@/components/ProtectedRoute";

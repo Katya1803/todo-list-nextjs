@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import { Task } from "@/types/task";
-import { database } from "@/lib/database";
+import { database } from "@/lib/taskDatabase";
 import BackButton from "@/components/BackButton";
 import ConfirmDialog from "@/components/ConfirmDialog";
 import { ProtectedRoute } from "@/components/ProtectedRoute";

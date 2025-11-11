@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Task } from "@/types/task";
-import { database } from "@/lib/database";
+import { database } from "@/lib/taskDatabase";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
